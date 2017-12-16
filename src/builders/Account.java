@@ -48,6 +48,9 @@ public class Account {
 		else champWinLoss[yourI][1]++;
 	}
 	
+	/*
+	 * Adds a win/loss for the champion you played with, corresponding with the champion you played
+	 */
 	public void addSynergy(int yourId, int synId, boolean win) {
 		int yourI = cs.getIndex(yourId);
 		int synI = cs.getIndex(synId);
