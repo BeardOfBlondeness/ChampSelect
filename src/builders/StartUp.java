@@ -16,11 +16,13 @@ public class StartUp {
 	
 	static RiotApi api;
 	static ApiConfig config;
+	public static ChampionStore CS;
 	
 	public static void main(String[] args) throws RiotApiException, InterruptedException {
-		config = new ApiConfig().setKey("\\");
+		
+		config = new ApiConfig().setKey("RGAPI-39be58c4-8f9a-42d7-9c76-4e67a8495dff");
 		api = new RiotApi(config);
-
+		CS = new ChampionStore(api);
 		// First we need to request the summoner because we will need it's account ID
 		Summoner summoner = api.getSummonerByName(Platform.EUW, "Ghaster");
 
@@ -39,14 +41,16 @@ public class StartUp {
 				
 			}
 		}
+		
 	}
 	
 	public static String getOtherChampions(Long matchID, String summonerID, Long accountID, MatchReference match) throws RiotApiException {
+		
 		System.out.println("Ghaster played " + match.getChampion());
 		Match tempMatch = api.getMatch(Platform.EUW, matchID);
 		List participants = tempMatch.getParticipantIdentities();
 		for(int i = 1; i < 11; i++) {
-			System.out.println(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getChampionId());
+			System.out.println(CS.get(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getChampionId()));
 			System.out.println(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getStats().isWin());
 		}
 		return "\n";		
