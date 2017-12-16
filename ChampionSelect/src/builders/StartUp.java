@@ -12,7 +12,7 @@ import net.rithms.riot.constant.Platform;
 public class StartUp {
 
 	public static void main(String[] args) throws RiotApiException {
-		ApiConfig config = new ApiConfig().setKey("THIS IS A KEY");
+		ApiConfig config = new ApiConfig().setKey("RGAPI-f81821ac-6225-4ef6-b2f6-c43bb1b27f2b");
 		RiotApi api = new RiotApi(config);
 
 		// First we need to request the summoner because we will need it's account ID
