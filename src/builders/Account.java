@@ -15,6 +15,9 @@ public class Account {
 		fillChampions();
 	}
 	
+	public Long getId() {
+		return summonerID;
+	}
 	/*
 	 * Creates the size of each array depending on how many champ's are currently in the game!
 	 */
