@@ -1,19 +1,24 @@
 package builders;
 
+import java.util.List;
+
 import net.rithms.riot.api.ApiConfig;
 import net.rithms.riot.api.RiotApi;
 import net.rithms.riot.api.RiotApiException;
 import net.rithms.riot.api.endpoints.match.dto.Match;
 import net.rithms.riot.api.endpoints.match.dto.MatchList;
 import net.rithms.riot.api.endpoints.match.dto.MatchReference;
+import net.rithms.riot.api.endpoints.static_data.dto.Champion;
 import net.rithms.riot.api.endpoints.summoner.dto.Summoner;
 import net.rithms.riot.constant.Platform;
 
 public class StartUp {
+	
 	static RiotApi api;
 	static ApiConfig config;
-	public static void main(String[] args) throws RiotApiException {
-		config = new ApiConfig().setKey("RGAPI-27ff443f-2c2f-4ba2-b03c-1f9adeb00a32");
+	
+	public static void main(String[] args) throws RiotApiException, InterruptedException {
+		config = new ApiConfig().setKey("RGAPI-e6fc0c96-3578-4514-85bd-b3c26ae54a8e");
 		api = new RiotApi(config);
 
 		// First we need to request the summoner because we will need it's account ID
@@ -29,6 +34,7 @@ public class StartUp {
 		if (matchList.getMatches() != null) {
 			for (MatchReference match : matchList.getMatches()) {
 				Match mat = api.getMatch(Platform.EUW, match.getGameId());
+				Thread.sleep(500);
 				System.out.println(getOtherChampions(mat.getGameId(), summoner.getName(), summoner.getAccountId(), match));
 				
 			}
@@ -38,8 +44,10 @@ public class StartUp {
 	public static String getOtherChampions(Long matchID, String summonerID, Long accountID, MatchReference match) throws RiotApiException {
 		System.out.println("Ghaster played " + match.getChampion());
 		Match tempMatch = api.getMatch(Platform.EUW, matchID);
-		for(int i = 0; i < 4; i++) {
-			
+		List participants = tempMatch.getParticipantIdentities();
+		for(int i = 1; i < 11; i++) {
+			System.out.println(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getChampionId());
+			System.out.println(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getStats().isWin());
 		}
 		return "";		
 	}
