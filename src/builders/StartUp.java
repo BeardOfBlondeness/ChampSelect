@@ -18,7 +18,7 @@ public class StartUp {
 	static ApiConfig config;
 	
 	public static void main(String[] args) throws RiotApiException, InterruptedException {
-		config = new ApiConfig().setKey("RGAPI-e6fc0c96-3578-4514-85bd-b3c26ae54a8e");
+		config = new ApiConfig().setKey("\\");
 		api = new RiotApi(config);
 
 		// First we need to request the summoner because we will need it's account ID
@@ -49,6 +49,6 @@ public class StartUp {
 			System.out.println(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getChampionId());
 			System.out.println(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getStats().isWin());
 		}
-		return "";		
+		return "\n";		
 	}
 }
