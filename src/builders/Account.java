@@ -5,9 +5,9 @@ import java.util.HashMap;
 public class Account {
 	
 	private Long summonerID; //The id of the summoner in the account you have created
-	private double[][] champWinLoss; //will hold the wins/losses for each champion you have played
-	private double[][][] oppWinLoss; //will hold the wins and losses for each champion you have played against, as each champion you have played
-	private double[][][] synWinLoss; //will hold the wins and losses for each champion you have played with, as each champion you have played
+	private int[][] champWinLoss; //will hold the wins/losses for each champion you have played
+	private int[][][] oppWinLoss; //will hold the wins and losses for each champion you have played against, as each champion you have played
+	private int[][][] synWinLoss; //will hold the wins and losses for each champion you have played with, as each champion you have played
 	ChampionStore cs; //Uses the ChampionStore to calculate the max number of champions in the game, as well as indexing each champion based on their ID
 	
 	public Account(Long summonerID) {
@@ -25,9 +25,9 @@ public class Account {
 		cs = StartUp.CS;
 		int numOfChamps = cs.getIds().size();
 		
-		champWinLoss = new double[numOfChamps][2];
-		oppWinLoss = new double[numOfChamps][numOfChamps][2];
-		synWinLoss = new double[numOfChamps][numOfChamps][2];
+		champWinLoss = new int[numOfChamps][2];
+		oppWinLoss = new int[numOfChamps][numOfChamps][2];
+		synWinLoss = new int[numOfChamps][numOfChamps][2];
 	}
 	
 	/*
