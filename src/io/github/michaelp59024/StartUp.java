@@ -50,15 +50,16 @@ public class StartUp {
 	
 	private static void loadPreferences() {
 		Preferences preferences = Preferences.userNodeForPackage(StartUp.class);
-		String key = preferences.get("API-KEY", "");
-		if (key.equals("")){
+		String key = preferences.get("api_key", null);
+		if (key==null){
 			System.out.println("No API key found. Please enter a key to use:");
 			key = scanner.nextLine();
 			System.out.println("Should the key be saved? (Y/n)");
 			String response = "";
-			while (!response.equals("n") && !response.equals("y")) response=scanner.nextLine().toLowerCase();
-			if (!response.equals("n")) preferences.put("API-KEY", key);
+			while (!response.equals("n") && !response.equals("y") && !response.equals("")) response=scanner.nextLine().toLowerCase();
+			if (!response.equals("n")) preferences.put("api_key", key);
 		}
+		else System.out.println("API key successfully loaded");
 		StartUp.apiKey=key;
 	}
 	
