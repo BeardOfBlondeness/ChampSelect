@@ -17,18 +17,13 @@ import net.rithms.riot.constant.Platform;
 
 public class ChampionStore implements java.io.Serializable {
 	private HashMap<Integer, Champion> champions;
-	private HashMap<Integer, Integer> indexes;
 	
 	public ChampionStore(RiotApi api) throws RiotApiException {
 		champions = new HashMap<Integer, Champion>();
-		indexes = new HashMap<Integer, Integer>();
 		ChampionList championList = api.getDataChampionList(Platform.EUW);
 		
-		int i = 0;
 		for(String champion:championList.getData().keySet()) {
 			champions.put(championList.getData().get(champion).getId(), championList.getData().get(champion));
-			indexes.put(championList.getData().get(champion).getId(), i);
-			i++;
 		}
 	}
 	
@@ -46,14 +41,6 @@ public class ChampionStore implements java.io.Serializable {
 	
 	public Champion get(int id) {
 		return champions.get(id);
-	}
-	
-	/**
-	 * @param id ID of champion
-	 * @return a unique index representing the champion
-	 */
-	public int getIndex(int id) { // TODO remove - must first remove uses in Account (use a HashMap in Account instead)
-		return indexes.get(id);
 	}
 	
 	/*
