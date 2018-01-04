@@ -32,7 +32,7 @@ public class StartUp {
 		
 		// First we need to request the summoner because we will need it's account ID
 		Summoner summoner = api.getSummonerByName(Platform.EUW, "Ghaster");
-
+		s
 		// Then we can use the account ID to request the summoner's match list
 		MatchList matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1, 1496327958, -1, -1);
 		

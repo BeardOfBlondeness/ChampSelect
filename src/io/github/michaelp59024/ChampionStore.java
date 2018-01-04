@@ -1,5 +1,11 @@
 package io.github.michaelp59024;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -9,7 +15,7 @@ import net.rithms.riot.api.endpoints.static_data.dto.Champion;
 import net.rithms.riot.api.endpoints.static_data.dto.ChampionList;
 import net.rithms.riot.constant.Platform;
 
-public class ChampionStore {
+public class ChampionStore implements java.io.Serializable {
 	private HashMap<Integer, Champion> champions;
 	private HashMap<Integer, Integer> indexes;
 	
@@ -48,5 +54,21 @@ public class ChampionStore {
 	 */
 	public int getIndex(int id) { // TODO remove - must first remove uses in Account (use a HashMap in Account instead)
 		return indexes.get(id);
+	}
+	
+	/*
+	 * Saves ChampionStore for ratelimits being annoying reasons
+	 */
+	public void saveChampData() {
+		try (
+				OutputStream file = new FileOutputStream("res/Current_Champion_Data.CSTORE");
+				OutputStream buffer = new BufferedOutputStream(file);
+				ObjectOutput output = new ObjectOutputStream(buffer);
+				){
+			output.writeObject(this);
+		}  
+		catch(IOException ex){
+			System.out.println("Cannot perform output." + ex);
+		}
 	}
 }
