@@ -42,7 +42,11 @@ public class ChampionStore {
 		return champions.get(id);
 	}
 	
-	public int getIndex(int id) {
+	/**
+	 * @param id ID of champion
+	 * @return a unique index representing the champion
+	 */
+	public int getIndex(int id) { // TODO remove - must first remove uses in Account (use a HashMap in Account instead)
 		return indexes.get(id);
 	}
 }

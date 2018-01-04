@@ -23,7 +23,7 @@ public class StartUp {
 	public static ChampionStore CS;
 	static int teamPosition;
 	
-	public static void main(String[] args) throws RiotApiException, InterruptedException {
+	public static void main(String[] args) throws RiotApiException {
 		loadPreferences();
 		config = new ApiConfig().setKey(StartUp.apiKey);
 		api = new RiotApi(config);
@@ -34,7 +34,7 @@ public class StartUp {
 		Summoner summoner = api.getSummonerByName(Platform.EUW, "Ghaster");
 
 		// Then we can use the account ID to request the summoner's match list
-		MatchList matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId());
+		MatchList matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1, 1496327958, -1, -1);
 		
 		System.out.println("Total Games in requested match list: " + matchList.getTotalGames());
 
@@ -42,7 +42,9 @@ public class StartUp {
 		if (matchList.getMatches() != null) {
 			for (MatchReference match : matchList.getMatches()) {
 				Match mat = api.getMatch(Platform.EUW, match.getGameId());
-				Thread.sleep(1000);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {}
 				System.out.println(getOtherChampions(mat.getGameId(), summoner.getName(), summoner.getAccountId(), match));
 			}
 		}
