@@ -1,5 +1,9 @@
 package io.github.beardofblondeness;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.time.Instant;
 import java.util.List;
 import java.util.Scanner;
@@ -15,7 +19,7 @@ import net.rithms.riot.api.endpoints.summoner.dto.Summoner;
 import net.rithms.riot.constant.Platform;
 
 public class StartUp {
-	
+
 	public static final Scanner scanner = new Scanner(System.in);
 	static RiotApi api;
 	private static String apiKey;
@@ -23,37 +27,43 @@ public class StartUp {
 	static Account acc;
 	public static ChampionStore CS;
 	static int teamPosition;
-	
+
 	public static void main(String[] args) throws RiotApiException {
 		loadPreferences();
 		config = new ApiConfig().setKey(StartUp.apiKey);
 		api = new RiotApi(config);
-		CS = new ChampionStore(api);
+		//CS = new ChampionStore(api);
+		setChampionStore();
 		acc = new Account(api.getSummonerByName(Platform.EUW, "Ghaster").getId());
-		
+
 		// First we need to request the summoner because we will need it's account ID
 		Summoner summoner = api.getSummonerByName(Platform.EUW, "Ghaster");
-		
+
 		long now = Instant.now().toEpochMilli();
 		long beginCrawlTime = now - 63113852000l;
-		
-		// Then we can use the account ID to request the summoner's match list
-		MatchList matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1l, -1l, -1, 1);
-		System.out.println(matchList.getStartIndex());
-		System.out.println("Total Games in requested match list: " + matchList.getTotalGames() + " " + matchList.getEndIndex());
 
-		// We can now iterate over the match list to access the data
-		if (matchList.getMatches() != null) {
-			for (MatchReference match : matchList.getMatches()) {
-				Match mat = api.getMatch(Platform.EUW, match.getGameId());
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {}
-				System.out.println(getOtherChampions(mat.getGameId(), summoner.getName(), summoner.getAccountId(), match));
+		// Then we can use the account ID to request the summoner's match list
+		MatchList matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1l, -1l, 0, 100);
+
+		for(int i = 0; matchList.getMatches().get(i).getTimestamp() > beginCrawlTime; i+=100) {
+			matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1l, -1l, i, i+100);
+			System.out.println(matchList.getStartIndex());
+			System.out.println("Total Games in requested match list: " + matchList.getTotalGames() + " " + matchList.getEndIndex());
+
+			// We can now iterate over the match list to access the data
+			if (matchList.getMatches() != null) {
+				for (MatchReference match : matchList.getMatches()) {
+					Match mat = api.getMatch(Platform.EUW, match.getGameId());
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {}
+					System.out.println(getOtherChampions(mat, summoner.getName(), summoner.getAccountId(), match));
+				}
 			}
 		}
+
 	}
-	
+
 	private static void loadPreferences() {
 		Preferences preferences = Preferences.userNodeForPackage(StartUp.class);
 		String key = preferences.get("api_key", null);
@@ -68,21 +78,21 @@ public class StartUp {
 		else System.out.println("API key successfully loaded");
 		StartUp.apiKey=key;
 	}
-	
-	public static String getOtherChampions(Long matchID, String summonerID, Long accountID, MatchReference match) throws RiotApiException {
+
+	public static String getOtherChampions(Match tempMatch, String summonerID, Long accountID, MatchReference match) throws RiotApiException {
 		teamPosition = -1;
 		System.out.println("Ghaster played " + match.getChampion());
-		Match tempMatch = api.getMatch(Platform.EUW, matchID);
+		System.out.println(match.getTimestamp() + " " + match.getSeason() + " " + tempMatch.getGameCreation());
 		List participants = tempMatch.getParticipantIdentities();
-		
+
 		/*
 		 * Initial Loop to calculate which player the account of interest is
 		 */
 		for(int i = 1; i < 11; i++) {
-			System.out.println(CS.get(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getChampionId()));
+			System.out.println(CS.get(api.getMatch(Platform.EUW, tempMatch.getGameId()).getParticipantByParticipantId(i).getChampionId()));
 			//System.out.println(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getStats().isWin());
 			//System.out.println(api.getMatch(Platform.EUW, matchID).getParticipantByParticipantId(i).getTeamId() + " is ghasters team");
-			
+
 			if(tempMatch.getParticipantByParticipantId(i).equals(tempMatch.getParticipantByAccountId(accountID))) {
 				teamPosition = i;
 				break;
@@ -90,5 +100,54 @@ public class StartUp {
 		}
 		System.out.println(teamPosition);
 		return "\n";		
+	}
+
+	public static void setChampionStore() throws RiotApiException {
+		String loadFile = "res/Current_Champion_Data.CSTORE";
+		File f = new File(loadFile);
+		if(f.exists() && !f.isDirectory()) {
+			CS = (ChampionStore) deserializeObject(CS, loadFile);
+			System.out.println("Loading champion data");
+		}
+		else {
+			CS = new ChampionStore(api);
+			CS.saveChampData();
+			System.out.println("Saving champion data");
+		}
+	}
+	
+	
+	/*
+	 * Decided to make this one general purpose so that we could use it for account as well 
+	 * TODO move this into some form of builder class or background class, SartUp is way too clusterfucked
+	 */
+	static Object deserializeObject(Object obj, String loadFile) {
+		FileInputStream fin = null;
+		ObjectInputStream ois = null;
+		try {
+			fin = new FileInputStream(loadFile);
+			ois = new ObjectInputStream(fin);
+			obj = ois.readObject();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+
+			if (fin != null) {
+				try {
+					fin.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return obj;
 	}
 }
