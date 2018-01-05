@@ -1,4 +1,4 @@
-package io.github.beardofblondeness;
+package io.github.beardofblondeness.champselect.backend;
 
 import java.util.HashMap;
 
