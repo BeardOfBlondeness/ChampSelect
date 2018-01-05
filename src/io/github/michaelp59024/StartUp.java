@@ -1,5 +1,6 @@
 package io.github.michaelp59024;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Scanner;
 import java.util.prefs.Preferences;
@@ -33,17 +34,20 @@ public class StartUp {
 		// First we need to request the summoner because we will need it's account ID
 		Summoner summoner = api.getSummonerByName(Platform.EUW, "Ghaster");
 		
-		// Then we can use the account ID to request the summoner's match list
-		MatchList matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1, 1496327958, -1, -1);
+		long now = Instant.now().toEpochMilli();
+		long beginCrawlTime = now - 63113852000l;
 		
-		System.out.println("Total Games in requested match list: " + matchList.getTotalGames());
+		// Then we can use the account ID to request the summoner's match list
+		MatchList matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1l, -1l, -1, 1);
+		System.out.println(matchList.getStartIndex());
+		System.out.println("Total Games in requested match list: " + matchList.getTotalGames() + " " + matchList.getEndIndex());
 
 		// We can now iterate over the match list to access the data
 		if (matchList.getMatches() != null) {
 			for (MatchReference match : matchList.getMatches()) {
 				Match mat = api.getMatch(Platform.EUW, match.getGameId());
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(2000);
 				} catch (InterruptedException e) {}
 				System.out.println(getOtherChampions(mat.getGameId(), summoner.getName(), summoner.getAccountId(), match));
 			}
