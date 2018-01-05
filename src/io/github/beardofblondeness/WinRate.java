@@ -1,4 +1,4 @@
-package io.github.michaelp59024;
+package io.github.beardofblondeness;
 
 public class WinRate {
 	int wins;

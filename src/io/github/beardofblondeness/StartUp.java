@@ -1,4 +1,4 @@
-package io.github.michaelp59024;
+package io.github.beardofblondeness;
 
 import java.util.List;
 import java.util.Scanner;
