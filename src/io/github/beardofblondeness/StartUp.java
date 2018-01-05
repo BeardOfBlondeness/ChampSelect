@@ -45,8 +45,7 @@ public class StartUp {
 		// Then we can use the account ID to request the summoner's match list
 		MatchList matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1l, -1l, 0, 100);
 
-		for(int i = 0; matchList.getMatches().get(i).getTimestamp() > beginCrawlTime; i+=100) {
-			matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1l, -1l, i, i+100);
+		for(int i = 100; matchList.getMatches().get(i).getTimestamp() > beginCrawlTime; i+=100) {	
 			System.out.println(matchList.getStartIndex());
 			System.out.println("Total Games in requested match list: " + matchList.getTotalGames() + " " + matchList.getEndIndex());
 
@@ -60,6 +59,7 @@ public class StartUp {
 					System.out.println(getOtherChampions(mat, summoner.getName(), summoner.getAccountId(), match));
 				}
 			}
+			matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1l, -1l, i, i+100);
 		}
 
 	}
@@ -115,7 +115,6 @@ public class StartUp {
 			System.out.println("Saving champion data");
 		}
 	}
-	
 	
 	/*
 	 * Decided to make this one general purpose so that we could use it for account as well 
