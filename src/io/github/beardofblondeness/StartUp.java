@@ -27,8 +27,14 @@ public class StartUp {
 	static Account acc;
 	public static ChampionStore CS;
 	static int teamPosition;
-
+	static Summoner summoner;
+	
 	public static void main(String[] args) throws RiotApiException {
+		apiSetUp();
+		beginCrawling();
+	}
+
+	public static void apiSetUp() throws RiotApiException {
 		loadPreferences();
 		config = new ApiConfig().setKey(StartUp.apiKey);
 		api = new RiotApi(config);
@@ -37,8 +43,10 @@ public class StartUp {
 		acc = new Account(api.getSummonerByName(Platform.EUW, "Ghaster").getId());
 
 		// First we need to request the summoner because we will need it's account ID
-		Summoner summoner = api.getSummonerByName(Platform.EUW, "Ghaster");
-
+		summoner = api.getSummonerByName(Platform.EUW, "Ghaster");
+	}
+	
+	public static void beginCrawling() throws RiotApiException {
 		long now = Instant.now().toEpochMilli();
 		long beginCrawlTime = now - 63113852000l;
 
@@ -61,9 +69,7 @@ public class StartUp {
 			}
 			matchList = api.getMatchListByAccountId(Platform.EUW, summoner.getAccountId(), null, null, null, -1l, -1l, i, i+100);
 		}
-
 	}
-
 	private static void loadPreferences() {
 		Preferences preferences = Preferences.userNodeForPackage(StartUp.class);
 		String key = preferences.get("api_key", null);
